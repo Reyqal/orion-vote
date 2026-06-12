@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import WebsiteCard from '@/components/WebsiteCard';
 
 interface Website {
@@ -13,28 +14,68 @@ interface Website {
   hasVoted: boolean;
 }
 
+// Supabase client khusus untuk realtime (pakai anon key, aman di frontend)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function HomePage() {
   const [websites, setWebsites] = useState<Website[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchWebsites = async () => {
-      try {
-        const res = await fetch('/api/websites');
-        const data = await res.json();
-        // Mengambil array-nya jika terbungkus object
-        setWebsites(data.websites || data.data || data);
-      } catch {
-        console.error('Gagal mengambil data website');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWebsites();
+  const fetchWebsites = useCallback(async () => {
+    try {
+      const res = await fetch('/api/websites');
+      const data = await res.json();
+      setWebsites(data.websites || data.data || data);
+    } catch {
+      console.error('Gagal mengambil data website');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Menghitung total seluruh vote yang masuk
+  useEffect(() => {
+    // Fetch data awal
+    fetchWebsites();
+
+    // Subscribe ke perubahan tabel Vote di Supabase Realtime
+    const channel = supabase
+      .channel('realtime-votes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',       // listen INSERT dan DELETE (vote & unvote)
+          schema: 'public',
+          table: 'Vote',
+        },
+        () => {
+          // Setiap ada perubahan vote, refetch data terbaru
+          fetchWebsites();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Realtime terhubung');
+        }
+      });
+
+    // Cleanup saat komponen unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchWebsites]);
+
+  // Callback untuk update vote count secara optimistic (tanpa tunggu refetch)
+  const handleVoteChange = useCallback((websiteId: string, voted: boolean, count: number) => {
+    setWebsites((prev) =>
+      prev.map((w) =>
+        w.id === websiteId ? { ...w, voteCount: count, hasVoted: voted } : w
+      )
+    );
+  }, []);
+
   const totalVotes = websites.reduce((sum, w) => sum + (w.voteCount || 0), 0);
 
   return (
@@ -84,7 +125,6 @@ export default function HomePage() {
                   WEBSITE
                 </span>
                 <br />
-                {/* Bungkus kata Favoritmu dan tambahkan margin-top (mt-4 atau mt-6) */}
                 <span className="inline-block mt-4 sm:mt-5">
                   Favoritmu
                 </span>
@@ -96,7 +136,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Stats Box (Diperbarui jadi 2 kolom) */}
+            {/* Stats Box */}
             <div className="flex gap-3 sm:gap-4 w-full sm:w-auto mt-4 lg:mt-0">
               <div
                 className="flex-1 sm:flex-none bg-primary text-white p-4 sm:p-6 text-center sm:min-w-[130px] lg:min-w-[140px]"
@@ -111,7 +151,9 @@ export default function HomePage() {
                 className="flex-1 sm:flex-none bg-coral text-white p-4 sm:p-6 text-center sm:min-w-[130px] lg:min-w-[140px]"
                 style={{ border: '4px solid #0a0a0a', boxShadow: '6px 6px 0 #0a0a0a' }}
               >
-                <div className="text-4xl sm:text-5xl font-black">{totalVotes}</div>
+                <div className="text-4xl sm:text-5xl font-black transition-all duration-300">
+                  {totalVotes}
+                </div>
                 <div className="text-[10px] sm:text-xs font-black uppercase tracking-widest mt-1">
                   Total Suara
                 </div>
@@ -174,8 +216,15 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {websites?.map((website, index) => (
-                <WebsiteCard key={website.id} website={website} index={index} />
+              {websites.map((website, index) => (
+                <WebsiteCard
+                  key={website.id}
+                  website={website}
+                  index={index}
+                  onVoteChange={(voted, count) =>
+                    handleVoteChange(website.id, voted, count)
+                  }
+                />
               ))}
             </div>
           )}

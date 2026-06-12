@@ -22,7 +22,13 @@ const accentColors = [
   { bg: 'bg-primary-light', hex: '#4d85ff' },
 ];
 
-export default function WebsiteCard({ website, index = 0 }: { website: Website; index?: number }) {
+interface WebsiteCardProps {
+  website: Website;
+  index?: number;
+  onVoteChange?: (voted: boolean, count: number) => void;
+}
+
+export default function WebsiteCard({ website, index = 0, onVoteChange }: WebsiteCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const accent = accentColors[index % accentColors.length];
@@ -48,21 +54,18 @@ export default function WebsiteCard({ website, index = 0 }: { website: Website; 
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-bg stripe-bg">
                 <div className="flex flex-col items-center gap-3">
-                  <div
-                    className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"
-                  />
+                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                   <span className="text-xs font-black uppercase tracking-widest text-text-muted">Loading...</span>
                 </div>
               </div>
             )}
-            
-            <img 
+            <img
               src={`https://api.microlink.io?url=${encodeURIComponent(website.url)}&screenshot=true&embed=screenshot.url`}
               alt={`Preview of ${website.title}`}
               className={`w-full h-full object-cover border-0 transition-opacity duration-300 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
               }`}
-              loading="lazy" 
+              loading="lazy"
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageError(true)}
             />
@@ -113,11 +116,15 @@ export default function WebsiteCard({ website, index = 0 }: { website: Website; 
           {website.description}
         </p>
 
-        <div className="flex items-center justify-between" style={{ paddingTop: '1rem', borderTop: '3px solid #0a0a0a' }}>
+        <div
+          className="flex items-center justify-between"
+          style={{ paddingTop: '1rem', borderTop: '3px solid #0a0a0a' }}
+        >
           <VoteButton
             websiteId={website.id}
             initialVoted={website.hasVoted}
             initialCount={website.voteCount}
+            onVoteChange={onVoteChange}
           />
 
           <a

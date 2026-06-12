@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 
 interface VoteButtonProps {
@@ -22,6 +22,15 @@ export default function VoteButton({
   const [loading, setLoading] = useState(false);
   const [animate, setAnimate] = useState(false);
 
+  // Sync state ketika data realtime masuk dari parent (Supabase update)
+  // Hanya update kalau tidak sedang dalam proses voting agar tidak bentrok
+  useEffect(() => {
+    if (!loading) {
+      setCount(initialCount);
+      setVoted(initialVoted);
+    }
+  }, [initialCount, initialVoted, loading]);
+
   const handleVote = async () => {
     if (!session) {
       signIn('google');
@@ -31,6 +40,7 @@ export default function VoteButton({
     setLoading(true);
     setAnimate(true);
 
+    // Optimistic update — langsung update UI sebelum tunggu response
     const newVoted = !voted;
     const newCount = newVoted ? count + 1 : count - 1;
     setVoted(newVoted);
@@ -49,10 +59,12 @@ export default function VoteButton({
         setCount(data.voteCount);
         onVoteChange?.(data.voted, data.voteCount);
       } else {
+        // Rollback kalau gagal
         setVoted(!newVoted);
         setCount(newVoted ? newCount - 1 : newCount + 1);
       }
     } catch {
+      // Rollback kalau network error
       setVoted(!newVoted);
       setCount(newVoted ? newCount - 1 : newCount + 1);
     } finally {
