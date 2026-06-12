@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 
 interface Website {
@@ -13,27 +14,59 @@ interface Website {
   hasVoted: boolean;
 }
 
+// Supabase client khusus untuk realtime (pakai anon key, aman di frontend)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function LeaderboardPage() {
   const [websites, setWebsites] = useState<Website[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchWebsites = async () => {
-      try {
-        const res = await fetch('/api/websites');
-        const data = await res.json();
-        const list = data.websites || data.data || data;
-        // Urutkan berdasarkan voteCount terbanyak
-        setWebsites([...list].sort((a: Website, b: Website) => b.voteCount - a.voteCount));
-      } catch {
-        console.error('Gagal mengambil data website');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWebsites();
+  const fetchWebsites = useCallback(async () => {
+    try {
+      const res = await fetch('/api/websites');
+      const data = await res.json();
+      const list = data.websites || data.data || data;
+      setWebsites([...list].sort((a: Website, b: Website) => b.voteCount - a.voteCount));
+    } catch {
+      console.error('Gagal mengambil data website');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    // Fetch data awal
+    fetchWebsites();
+
+    // Subscribe ke perubahan tabel Vote di Supabase Realtime
+    const channel = supabase
+      .channel('realtime-leaderboard')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',       // listen INSERT dan DELETE (vote & unvote)
+          schema: 'public',
+          table: 'Vote',
+        },
+        () => {
+          // Setiap ada perubahan vote, refetch data terbaru
+          fetchWebsites();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Leaderboard realtime terhubung');
+        }
+      });
+
+    // Cleanup saat komponen unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchWebsites]);
 
   const totalVotes = websites.reduce((sum, w) => sum + w.voteCount, 0);
 
