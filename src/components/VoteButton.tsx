@@ -19,22 +19,32 @@ export default function VoteButton({
   const { data: session } = useSession();
   const [voted, setVoted] = useState(initialVoted);
   const [count, setCount] = useState(initialCount);
-  const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [animate, setAnimate] = useState(false);
 
   const handleVote = async () => {
+    // 1. Cek login
     if (!session) {
       signIn('google');
       return;
     }
 
-    setLoading(true);
-    setAnimate(true);
+    // 2. Cegah spam klik (tapi tombol tidak usah dibuat disable visual)
+    if (isProcessing) return;
 
+    // 3. Simpan state lama untuk jaga-jaga kalau error (Rollback)
+    const prevVoted = voted;
+    const prevCount = count;
+
+    // 4. OPTIMISTIC UPDATE: Berubah secara instan di layar detik itu juga!
     const newVoted = !voted;
     const newCount = newVoted ? count + 1 : count - 1;
     setVoted(newVoted);
     setCount(newCount);
+    
+    // 5. Nyalakan animasi & kunci proses background
+    setAnimate(true);
+    setIsProcessing(true);
 
     try {
       const res = await fetch('/api/vote', {
@@ -45,18 +55,19 @@ export default function VoteButton({
 
       if (res.ok) {
         const data = await res.json();
-        setVoted(data.voted);
-        setCount(data.voteCount);
+        // Beri tahu parent component jika ada
         onVoteChange?.(data.voted, data.voteCount);
       } else {
-        setVoted(!newVoted);
-        setCount(newVoted ? newCount - 1 : newCount + 1);
+        // ROLLBACK: Kalau server gagal, kembalikan seperti semula
+        setVoted(prevVoted);
+        setCount(prevCount);
       }
     } catch {
-      setVoted(!newVoted);
-      setCount(newVoted ? newCount - 1 : newCount + 1);
+      // ROLLBACK: Kalau internet putus, kembalikan seperti semula
+      setVoted(prevVoted);
+      setCount(prevCount);
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
       setTimeout(() => setAnimate(false), 400);
     }
   };
@@ -64,10 +75,10 @@ export default function VoteButton({
   return (
     <button
       onClick={handleVote}
-      disabled={loading}
+      // HAPUS efek disable visual di sini agar terasa sangat instan
       className={`${
         voted ? 'btn-neo-voted' : 'btn-neo'
-      } flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer`}
+      } flex items-center gap-2 cursor-pointer active:scale-95 transition-transform`}
     >
       <span
         className={`text-lg transition-transform duration-200 ${
@@ -77,7 +88,9 @@ export default function VoteButton({
       >
         {voted ? '♥' : '♡'}
       </span>
-      <span>{voted ? 'Voted!' : 'Vote'}</span>
+      <span className="uppercase tracking-widest font-black text-sm">
+        {voted ? 'Voted!' : 'Vote'}
+      </span>
       <span
         className={`inline-flex items-center justify-center min-w-[1.75rem] h-6 px-1.5 text-xs font-black ${
           voted

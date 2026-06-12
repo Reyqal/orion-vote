@@ -4,7 +4,7 @@ import Providers from '@/components/Providers';
 import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
-  title: 'OrionVote — Favorite Website Voting System',
+  title: 'OrionVote',
   description: 'Preview and vote for your favorite deployed websites. An interactive voting platform with live iframe previews.',
   keywords: ['voting', 'websites', 'favorites', 'poll'],
 };
