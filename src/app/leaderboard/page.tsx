@@ -200,7 +200,7 @@ export default function LeaderboardPage() {
                           <span className="text-3xl">{medal}</span>
                         ) : (
                           <span
-                            className="w-9 h-9 flex items-center justify-center bg-bg text-text text-sm font-black"
+                            className="w-9 h-9 bg-accent flex items-center justify-center bg-bg text-text text-sm font-black"
                             style={{ border: '3px solid #0a0a0a' }}
                           >
                             {idx + 1}
