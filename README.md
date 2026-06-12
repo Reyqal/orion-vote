@@ -1,4 +1,4 @@
-# ⭐ VoteHub — Favorite Website Voting System
+# ⭐ OrionVote — Favorite Website Voting System
 
 A stunning, full-stack voting platform where users preview deployed websites via embedded iframes and vote for their favorites. Built with **Next.js 16 (App Router)**, **Tailwind CSS v4**, **NextAuth.js** (Google OAuth), and **Prisma ORM** (PostgreSQL).
 
@@ -152,7 +152,7 @@ git push origin main
 1. Go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. Add all environment variables from `.env.example`
-4. Set `NEXTAUTH_URL` to your Vercel domain (e.g., `https://votehub.vercel.app`)
+4. Set `NEXTAUTH_URL` to your Vercel domain (e.g., `https://OrionVote.vercel.app`)
 5. Deploy!
 
 ### 3. Post-deployment

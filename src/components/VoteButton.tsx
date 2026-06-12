@@ -79,10 +79,10 @@ export default function VoteButton({
       </span>
       <span>{voted ? 'Voted!' : 'Vote'}</span>
       <span
-        className={`inline-flex items-center justify-center min-w-[1.75rem] h-7 px-1.5 rounded-md text-xs font-black ${
+        className={`inline-flex items-center justify-center min-w-[1.75rem] h-6 px-1.5 text-xs font-black ${
           voted
-            ? 'bg-white/30 text-white border-2 border-white/40'
-            : 'bg-white/20 text-white border-2 border-white/30'
+            ? 'bg-white/30 text-white border-2 border-white/50'
+            : 'bg-white/20 text-white border-2 border-white/40'
         }`}
       >
         {count}

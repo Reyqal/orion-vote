@@ -27,24 +27,31 @@ export default function AdminPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <div
-          className="w-20 h-20 rounded-xl bg-coral-light flex items-center justify-center text-4xl"
-          style={{ border: '3px solid #2d3436', boxShadow: '5px 5px 0 #2d3436' }}
+          className="w-20 h-20 bg-coral flex items-center justify-center text-4xl"
+          style={{ border: '4px solid #0a0a0a', boxShadow: '6px 6px 0 #0a0a0a' }}
         >
           🔒
         </div>
-        <h1 className="text-3xl font-black">Access Denied</h1>
-        <p className="text-text-muted font-medium">You need admin privileges to access this page.</p>
+        <h1 className="text-4xl font-black uppercase tracking-tight">Access Denied</h1>
+        <p className="text-text-muted font-bold">You need admin privileges to access this page.</p>
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="relative mb-8 dot-bg">
-        <div className="relative">
-          <h1 className="text-4xl font-black text-text mb-2 tracking-tight">Admin Dashboard</h1>
-          <p className="text-text-muted font-medium">Manage participant websites for the voting system.</p>
+      {/* Header */}
+      <div className="mb-10">
+        <div
+          className="inline-block bg-primary text-white text-xs font-black uppercase tracking-widest px-3 py-1 mb-4"
+          style={{ border: '3px solid #0a0a0a', boxShadow: '3px 3px 0 #0a0a0a' }}
+        >
+          Admin Dashboard
         </div>
+        <h1 className="text-5xl font-black text-text uppercase tracking-tight leading-none">
+          Manage<br />Websites
+        </h1>
+        <div className="mt-4 h-[4px] bg-border" />
       </div>
       <AdminPanel />
     </div>

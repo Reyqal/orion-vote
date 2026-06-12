@@ -1,28 +1,29 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary: #6c5ce7;
-  --color-primary-light: #a29bfe;
-  --color-primary-dark: #5a4bd1;
-  --color-accent: #fdcb6e;
-  --color-accent-dark: #f0b429;
-  --color-mint: #00b894;
-  --color-mint-light: #55efc4;
-  --color-coral: #e17055;
-  --color-coral-light: #fab1a0;
-  --color-sky: #74b9ff;
-  --color-sky-dark: #0984e3;
-  --color-pink: #fd79a8;
-  --color-pink-dark: #e84393;
-  --color-bg: #f5f0e8;
-  --color-bg-alt: #ede6d8;
+  --color-primary: #0052FF;
+  --color-primary-light: #4d85ff;
+  --color-primary-dark: #0040cc;
+  --color-accent: #FFE500;
+  --color-accent-dark: #ccb800;
+  --color-mint: #00FF88;
+  --color-mint-light: #80ffbb;
+  --color-coral: #FF2D55;
+  --color-coral-light: #ff8099;
+  --color-sky: #00D4FF;
+  --color-sky-dark: #00a8cc;
+  --color-pink: #FF2D55;
+  --color-pink-dark: #cc2444;
+  --color-bg: #FFFFF0;
+  --color-bg-alt: #f5f5dc;
   --color-surface: #ffffff;
-  --color-text: #2d3436;
-  --color-text-muted: #636e72;
-  --color-border: #2d3436;
-  --color-success: #00b894;
-  --color-danger: #d63031;
+  --color-text: #0a0a0a;
+  --color-text-muted: #333333;
+  --color-border: #0a0a0a;
+  --color-success: #00FF88;
+  --color-danger: #FF2D55;
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
 }
 
 @layer base {
@@ -34,97 +35,101 @@
   }
 
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 12px;
   }
 
   ::-webkit-scrollbar-track {
     background: var(--color-bg);
-    border-left: 3px solid var(--color-border);
+    border-left: 4px solid var(--color-border);
   }
 
   ::-webkit-scrollbar-thumb {
     background: var(--color-primary);
-    border: 2px solid var(--color-border);
+    border: 3px solid var(--color-border);
   }
 }
 
 @layer components {
+  /* ─── NEOBRUTALISM CORE ─── */
   .neo-box {
     background: var(--color-surface);
-    border: 3px solid var(--color-border);
-    box-shadow: 5px 5px 0 var(--color-border);
+    border: 4px solid var(--color-border);
+    box-shadow: 8px 8px 0 var(--color-border);
   }
 
   .neo-box-sm {
     background: var(--color-surface);
-    border: 2px solid var(--color-border);
-    box-shadow: 3px 3px 0 var(--color-border);
-  }
-
-  .neo-box-color {
     border: 3px solid var(--color-border);
     box-shadow: 5px 5px 0 var(--color-border);
   }
 
+  .neo-box-color {
+    border: 4px solid var(--color-border);
+    box-shadow: 8px 8px 0 var(--color-border);
+  }
+
   .neo-hover {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
   }
 
   .neo-hover:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 var(--color-border);
+    transform: translate(-3px, -3px);
+    box-shadow: 11px 11px 0 var(--color-border);
   }
 
   .neo-hover:active {
-    transform: translate(2px, 2px);
+    transform: translate(4px, 4px);
     box-shadow: 2px 2px 0 var(--color-border);
   }
 
+  /* ─── BUTTONS ─── */
   .btn-neo {
     background: var(--color-primary);
     color: white;
     padding: 0.625rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 700;
-    border: 3px solid var(--color-border);
-    box-shadow: 4px 4px 0 var(--color-border);
-    transition: all 0.15s ease;
+    border-radius: 0px;
+    font-weight: 900;
+    border: 4px solid var(--color-border);
+    box-shadow: 5px 5px 0 var(--color-border);
+    transition: all 0.1s ease;
     text-transform: uppercase;
-    letter-spacing: 0.025em;
-    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
   }
 
   .btn-neo:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--color-border);
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--color-border);
   }
 
   .btn-neo:active {
-    transform: translate(2px, 2px);
+    transform: translate(3px, 3px);
     box-shadow: 1px 1px 0 var(--color-border);
   }
 
   .btn-neo-voted {
-    background: var(--color-pink);
+    background: var(--color-coral);
     color: white;
     padding: 0.625rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 700;
-    border: 3px solid var(--color-border);
-    box-shadow: 4px 4px 0 var(--color-border);
-    transition: all 0.15s ease;
+    border-radius: 0px;
+    font-weight: 900;
+    border: 4px solid var(--color-border);
+    box-shadow: 5px 5px 0 var(--color-border);
+    transition: all 0.1s ease;
     text-transform: uppercase;
-    letter-spacing: 0.025em;
-    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
   }
 
   .btn-neo-voted:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--color-border);
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--color-border);
   }
 
   .btn-neo-voted:active {
-    transform: translate(2px, 2px);
+    transform: translate(3px, 3px);
     box-shadow: 1px 1px 0 var(--color-border);
   }
 
@@ -132,88 +137,111 @@
     background: var(--color-accent);
     color: var(--color-text);
     padding: 0.625rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 700;
-    border: 3px solid var(--color-border);
-    box-shadow: 4px 4px 0 var(--color-border);
-    transition: all 0.15s ease;
+    border-radius: 0px;
+    font-weight: 900;
+    border: 4px solid var(--color-border);
+    box-shadow: 5px 5px 0 var(--color-border);
+    transition: all 0.1s ease;
     text-transform: uppercase;
-    letter-spacing: 0.025em;
-    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
   }
 
   .btn-neo-accent:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--color-border);
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--color-border);
   }
 
   .btn-neo-accent:active {
-    transform: translate(2px, 2px);
+    transform: translate(3px, 3px);
     box-shadow: 1px 1px 0 var(--color-border);
   }
 
+  /* ─── INPUTS ─── */
   .neo-input {
     width: 100%;
     padding: 0.625rem 1rem;
-    border-radius: 8px;
+    border-radius: 0px;
     background: var(--color-surface);
-    border: 3px solid var(--color-border);
+    border: 4px solid var(--color-border);
     color: var(--color-text);
-    font-weight: 500;
-    transition: box-shadow 0.15s ease;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: box-shadow 0.1s ease;
+    font-family: var(--font-sans);
   }
 
   .neo-input:focus {
     outline: none;
-    box-shadow: 4px 4px 0 var(--color-primary);
+    box-shadow: 5px 5px 0 var(--color-primary);
+    border-color: var(--color-primary);
   }
 
   .neo-input::placeholder {
     color: var(--color-text-muted);
-    opacity: 0.6;
+    opacity: 0.5;
+    font-weight: 500;
   }
 
+  /* ─── BADGE ─── */
   .neo-badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 0.75rem;
-    border: 2px solid var(--color-border);
-    box-shadow: 2px 2px 0 var(--color-border);
+    padding: 0.2rem 0.65rem;
+    border-radius: 0px;
+    font-weight: 900;
+    font-size: 0.7rem;
+    border: 3px solid var(--color-border);
+    box-shadow: 3px 3px 0 var(--color-border);
     text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-sans);
   }
 
+  /* ─── TEXT ─── */
   .gradient-text-neo {
     color: var(--color-primary);
   }
 
+  /* ─── BACKGROUNDS ─── */
   .stripe-bg {
     background-image: repeating-linear-gradient(
       -45deg,
       transparent,
-      transparent 10px,
-      rgba(45, 52, 54, 0.03) 10px,
-      rgba(45, 52, 54, 0.03) 20px
+      transparent 8px,
+      rgba(10, 10, 10, 0.04) 8px,
+      rgba(10, 10, 10, 0.04) 16px
     );
   }
 
   .dot-bg {
-    background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
-    background-size: 24px 24px;
-    opacity: 0.15;
+    background-image: radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
+    opacity: 0.07;
+  }
+
+  /* ─── CHECKER PATTERN (neobrutalism signature) ─── */
+  .checker-bg {
+    background-image:
+      repeating-conic-gradient(#FFE500 0% 25%, transparent 0% 50%);
+    background-size: 20px 20px;
   }
 }
 
 @keyframes bounce-in {
-  0% { transform: scale(0.9); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% { transform: scale(0.85) translate(4px, 4px); }
+  60% { transform: scale(1.08) translate(-2px, -2px); }
+  100% { transform: scale(1) translate(0, 0); }
 }
 
 @keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-3deg); }
-  75% { transform: rotate(3deg); }
+  0%, 100% { transform: rotate(0deg) scale(1.2); }
+  25% { transform: rotate(-8deg) scale(1.2); }
+  75% { transform: rotate(8deg) scale(1.2); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

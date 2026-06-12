@@ -19,6 +19,13 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editUrl, setEditUrl] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+
   const fetchWebsites = async () => {
     try {
       const res = await fetch('/api/websites');
@@ -78,23 +85,75 @@ export default function AdminPanel() {
     }
   };
 
+  const startEdit = (site: Website) => {
+    setEditingId(site.id);
+    setEditTitle(site.title);
+    setEditDescription(site.description);
+    setEditUrl(site.url);
+    setMessage(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditTitle('');
+    setEditDescription('');
+    setEditUrl('');
+  };
+
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingId) return;
+
+    setEditLoading(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch(`/api/websites/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: editTitle, description: editDescription, url: editUrl }),
+      });
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: '✓ Website updated successfully!' });
+        cancelEdit();
+        fetchWebsites();
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || 'Failed to update website' });
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Network error' });
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
-      {/* Add Website Form */}
-      <div className="neo-box rounded-xl p-6">
-        <h2 className="text-xl font-black mb-6 flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-mint flex items-center justify-center text-white text-sm" style={{ border: '2px solid #2d3436' }}>+</span>
+      {/* ─── ADD WEBSITE ─── */}
+      <div
+        className="bg-surface p-6"
+        style={{ border: '4px solid #0a0a0a', boxShadow: '8px 8px 0 #0a0a0a' }}
+      >
+        <h2 className="text-xl font-black mb-6 uppercase tracking-tight flex items-center gap-3">
+          <span
+            className="w-8 h-8 bg-mint flex items-center justify-center text-text text-sm font-black"
+            style={{ border: '3px solid #0a0a0a', boxShadow: '2px 2px 0 #0a0a0a' }}
+          >
+            +
+          </span>
           Add New Website
         </h2>
 
         {message && (
           <div
-            className={`mb-4 p-3 rounded-lg text-sm font-bold ${
+            className={`mb-4 p-3 text-sm font-black uppercase tracking-wide ${
               message.type === 'success'
-                ? 'bg-mint-light/40 text-text border-2 border-border'
-                : 'bg-coral-light/40 text-text border-2 border-border'
+                ? 'bg-mint text-text'
+                : 'bg-coral text-white'
             }`}
-            style={{ boxShadow: '2px 2px 0 #2d3436' }}
+            style={{ border: '3px solid #0a0a0a', boxShadow: '3px 3px 0 #0a0a0a' }}
           >
             {message.text}
           </div>
@@ -102,7 +161,7 @@ export default function AdminPanel() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-text mb-1.5 uppercase tracking-wide">Title</label>
+            <label className="block text-xs font-black text-text mb-1.5 uppercase tracking-widest">Title</label>
             <input
               type="text"
               value={title}
@@ -113,18 +172,18 @@ export default function AdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-text mb-1.5 uppercase tracking-wide">Description</label>
+            <label className="block text-xs font-black text-text mb-1.5 uppercase tracking-widest">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
               rows={3}
-              placeholder="A brief description of the website..."
+              placeholder="A brief description..."
               className="neo-input resize-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-text mb-1.5 uppercase tracking-wide">Deployed URL</label>
+            <label className="block text-xs font-black text-text mb-1.5 uppercase tracking-widest">Deployed URL</label>
             <input
               type="url"
               value={url}
@@ -151,37 +210,149 @@ export default function AdminPanel() {
         </form>
       </div>
 
-      {/* Websites List */}
-      <div className="neo-box rounded-xl p-6">
-        <h2 className="text-xl font-black mb-6 flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-text text-sm" style={{ border: '2px solid #2d3436' }}>☰</span>
+      {/* ─── EDIT MODAL ─── */}
+      {editingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div
+            className="bg-surface w-full max-w-lg p-6 relative"
+            style={{ border: '4px solid #0a0a0a', boxShadow: '8px 8px 0 #0a0a0a' }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+                <span
+                  className="w-8 h-8 bg-sky flex items-center justify-center text-text text-sm font-black"
+                  style={{ border: '3px solid #0a0a0a', boxShadow: '2px 2px 0 #0a0a0a' }}
+                >
+                  ✎
+                </span>
+                Edit Website
+              </h2>
+              <button
+                onClick={cancelEdit}
+                className="w-8 h-8 flex items-center justify-center font-black text-text hover:bg-coral hover:text-white transition-colors cursor-pointer"
+                style={{ border: '3px solid #0a0a0a' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleEdit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-text mb-1.5 uppercase tracking-widest">Title</label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  required
+                  className="neo-input"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-text mb-1.5 uppercase tracking-widest">Description</label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  required
+                  rows={3}
+                  className="neo-input resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-text mb-1.5 uppercase tracking-widest">Deployed URL</label>
+                <input
+                  type="url"
+                  value={editUrl}
+                  onChange={(e) => setEditUrl(e.target.value)}
+                  required
+                  className="neo-input"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  disabled={editLoading}
+                  className="btn-neo flex-1 text-center disabled:opacity-50 cursor-pointer"
+                >
+                  {editLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    '✓ Save Changes'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="btn-neo-accent cursor-pointer"
+                  style={{ background: '#b2bec3' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MANAGE WEBSITES ─── */}
+      <div
+        className="bg-surface p-6"
+        style={{ border: '4px solid #0a0a0a', boxShadow: '8px 8px 0 #0a0a0a' }}
+      >
+        <h2 className="text-xl font-black mb-6 uppercase tracking-tight flex items-center gap-3">
+          <span
+            className="w-8 h-8 bg-accent flex items-center justify-center text-text text-sm font-black"
+            style={{ border: '3px solid #0a0a0a', boxShadow: '2px 2px 0 #0a0a0a' }}
+          >
+            ☰
+          </span>
           Manage Websites
-          <span className="neo-badge bg-sky text-text ml-2">{websites.length}</span>
+          <span
+            className="neo-badge bg-sky text-text ml-1"
+          >
+            {websites.length}
+          </span>
         </h2>
 
         {websites.length === 0 ? (
-          <div className="text-center py-10">
-            <p className="text-text-muted font-bold">No websites added yet.</p>
-            <p className="text-text-muted text-sm mt-1">Use the form above to add one.</p>
+          <div className="text-center py-10 bg-bg stripe-bg" style={{ border: '3px solid #0a0a0a' }}>
+            <p className="text-text-muted font-black uppercase text-sm">No websites added yet.</p>
+            <p className="text-text-muted text-xs mt-1 font-bold">Use the form above to add one.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {websites.map((site) => (
               <div
                 key={site.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-bg border-2 border-border group hover:shadow-[3px_3px_0_#2d3436] transition-all"
+                className="flex items-center justify-between p-4 bg-bg hover:bg-accent/20 transition-colors"
+                style={{ border: '3px solid #0a0a0a', boxShadow: '3px 3px 0 #0a0a0a' }}
               >
                 <div className="flex-1 min-w-0 mr-4">
-                  <h3 className="font-bold text-text truncate">{site.title}</h3>
-                  <p className="text-xs text-text-muted truncate font-medium">{site.url}</p>
+                  <h3 className="font-black text-text truncate uppercase text-sm tracking-tight">{site.title}</h3>
+                  <p className="text-xs text-text-muted truncate font-bold">{site.url}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="neo-badge bg-accent text-text">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="neo-badge bg-accent text-text"
+                  >
                     {site.voteCount} vote{site.voteCount !== 1 ? 's' : ''}
                   </span>
                   <button
+                    onClick={() => startEdit(site)}
+                    className="p-2 font-black text-text-muted hover:text-white hover:bg-sky transition-all cursor-pointer"
+                    style={{ border: '3px solid #0a0a0a' }}
+                    title="Edit website"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
                     onClick={() => handleDelete(site.id)}
-                    className="p-2 rounded-lg font-bold text-text-muted hover:text-danger hover:bg-coral-light/20 border-2 border-transparent hover:border-border transition-all cursor-pointer"
+                    className="p-2 font-black text-text-muted hover:text-white hover:bg-coral transition-all cursor-pointer"
+                    style={{ border: '3px solid #0a0a0a' }}
                     title="Delete website"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
