@@ -132,7 +132,7 @@ export default function HomePage() {
 
               <p className="text-base font-bold text-text-muted max-w-lg leading-relaxed">
                 Lihat pratinjau karya website peserta langsung dari browser-mu.<br />
-                <strong className="text-text">Satu akun = satu suara.</strong> Gunakan suaramu dengan bijak.
+                <strong className="text-text">Berikan suara untuk mendukung karya favoritmu!</strong>  
               </p>
             </div>
 
